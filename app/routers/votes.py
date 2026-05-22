@@ -27,6 +27,9 @@ def recalculate_stats(character_id: int, db: Session):
         stats.sonsa = 0
         stats.lerdona = 0
         stats.elegancia = 0
+        stats.fofoqueira = 0
+        stats.mentirosa = 0
+        stats.boa_energia = 0
         stats.total_votes = 0
     else:
         n = len(votes)
@@ -36,6 +39,9 @@ def recalculate_stats(character_id: int, db: Session):
         stats.sonsa = sum(v.sonsa for v in votes) / n
         stats.lerdona = sum(v.lerdona for v in votes) / n
         stats.elegancia = sum(v.elegancia for v in votes) / n
+        stats.fofoqueira = sum(v.fofoqueira for v in votes) / n
+        stats.mentirosa = sum(v.mentirosa for v in votes) / n
+        stats.boa_energia = sum(v.boa_energia for v in votes) / n
         stats.total_votes = n
 
     db.commit()
@@ -86,6 +92,9 @@ def submit_vote(data: VoteCreate, user: User = Depends(get_current_user), db: Se
         sonsa=data.sonsa,
         lerdona=data.lerdona,
         elegancia=data.elegancia,
+        fofoqueira=data.fofoqueira,
+        mentirosa=data.mentirosa,
+        boa_energia=data.boa_energia,
     )
     db.add(vote)
     db.commit()
@@ -112,6 +121,9 @@ def vote_summary(db: Session = Depends(get_db)):
                 sonsa=round(stats.sonsa, 2),
                 lerdona=round(stats.lerdona, 2),
                 elegancia=round(stats.elegancia, 2),
+                fofoqueira=round(stats.fofoqueira, 2),
+                mentirosa=round(stats.mentirosa, 2),
+                boa_energia=round(stats.boa_energia, 2),
                 total_votes=stats.total_votes,
             ))
     return VoteSummaryOut(characters=items)

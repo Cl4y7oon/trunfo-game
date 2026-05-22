@@ -39,6 +39,9 @@ class Vote(Base):
     sonsa = Column(Integer, nullable=False)
     lerdona = Column(Integer, nullable=False)
     elegancia = Column(Integer, nullable=False)
+    fofoqueira = Column(Integer, nullable=False)
+    mentirosa = Column(Integer, nullable=False)
+    boa_energia = Column(Integer, nullable=False)
 
     user = relationship("User", back_populates="votes")
     character = relationship("Character", back_populates="votes")
@@ -54,6 +57,9 @@ class CharacterStat(Base):
     sonsa = Column(Float, default=0)
     lerdona = Column(Float, default=0)
     elegancia = Column(Float, default=0)
+    fofoqueira = Column(Float, default=0)
+    mentirosa = Column(Float, default=0)
+    boa_energia = Column(Float, default=0)
     total_votes = Column(Integer, default=0)
 
     character = relationship("Character", back_populates="stats")

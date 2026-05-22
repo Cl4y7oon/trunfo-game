@@ -50,6 +50,9 @@ export interface VoteCreate {
   sonsa: number;
   lerdona: number;
   elegancia: number;
+  fofoqueira: number;
+  mentirosa: number;
+  boa_energia: number;
 }
 
 export interface VoteSummaryItem {
@@ -61,6 +64,9 @@ export interface VoteSummaryItem {
   sonsa: number;
   lerdona: number;
   elegancia: number;
+  fofoqueira: number;
+  mentirosa: number;
+  boa_energia: number;
   total_votes: number;
 }
 
@@ -88,6 +94,9 @@ export interface GameCardOut {
   sonsa: number;
   lerdona: number;
   elegancia: number;
+  fofoqueira: number;
+  mentirosa: number;
+  boa_energia: number;
   played: boolean;
 }
 

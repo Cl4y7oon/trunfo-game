@@ -16,6 +16,9 @@ const ATTR_META: Record<string, { label: string; color: string; icon: string }> 
   sonsa: { label: 'Sonsa', color: '#C44DFF', icon: '😏' },
   lerdona: { label: 'Lerdona', color: '#5DADE2', icon: '🦥' },
   elegancia: { label: 'Elegância', color: '#FFD700', icon: '👑' },
+  fofoqueira: { label: 'Fofoqueira', color: '#FF69B4', icon: '🗣️' },
+  mentirosa: { label: 'Mentiroso', color: '#9B59B6', icon: '🎭' },
+  boa_energia: { label: 'Boa Energia', color: '#2ECC71', icon: '🌟' },
 };
 
 export default function GamePage() {

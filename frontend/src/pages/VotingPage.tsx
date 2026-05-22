@@ -14,6 +14,9 @@ const ATTRIBUTES = [
   { key: 'sonsa', label: 'Sonsa', color: '#C44DFF', icon: '😏' },
   { key: 'lerdona', label: 'Lerdona', color: '#5DADE2', icon: '🦥' },
   { key: 'elegancia', label: 'Elegância', color: '#FFD700', icon: '👑' },
+  { key: 'fofoqueira', label: 'Fofoqueira', color: '#FF69B4', icon: '🗣️' },
+  { key: 'mentirosa', label: 'Mentiroso', color: '#9B59B6', icon: '🎭' },
+  { key: 'boa_energia', label: 'Boa Energia', color: '#2ECC71', icon: '🌟' },
 ];
 
 const SWIPE_THRESHOLD = 120;

@@ -38,13 +38,16 @@ class CharacterStatOut(BaseModel):
     sonsa: float
     lerdona: float
     elegancia: float
+    fofoqueira: float
+    mentirosa: float
+    boa_energia: float
     total_votes: int
     model_config = {"from_attributes": True}
 
 
 # ── Votes ──
 
-ATTRIBUTES = ["carismatica", "sincera", "barraqueira", "sonsa", "lerdona", "elegancia"]
+ATTRIBUTES = ["carismatica", "sincera", "barraqueira", "sonsa", "lerdona", "elegancia", "fofoqueira", "mentirosa", "boa_energia"]
 
 class VoteCreate(BaseModel):
     character_id: int
@@ -54,6 +57,9 @@ class VoteCreate(BaseModel):
     sonsa: int = Field(ge=0, le=21)
     lerdona: int = Field(ge=0, le=21)
     elegancia: int = Field(ge=0, le=21)
+    fofoqueira: int = Field(ge=0, le=21)
+    mentirosa: int = Field(ge=0, le=21)
+    boa_energia: int = Field(ge=0, le=21)
 
 class VoteOut(BaseModel):
     id: int
@@ -65,6 +71,9 @@ class VoteOut(BaseModel):
     sonsa: int
     lerdona: int
     elegancia: int
+    fofoqueira: int
+    mentirosa: int
+    boa_energia: int
     model_config = {"from_attributes": True}
 
 class VoteStatusCharacter(BaseModel):
@@ -86,6 +95,9 @@ class VoteSummaryItem(BaseModel):
     sonsa: float
     lerdona: float
     elegancia: float
+    fofoqueira: float
+    mentirosa: float
+    boa_energia: float
     total_votes: int
 
 class VoteSummaryOut(BaseModel):
@@ -122,6 +134,9 @@ class GameCardOut(BaseModel):
     sonsa: float
     lerdona: float
     elegancia: float
+    fofoqueira: float
+    mentirosa: float
+    boa_energia: float
     played: bool
     model_config = {"from_attributes": True}
 
