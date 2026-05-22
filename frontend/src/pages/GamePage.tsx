@@ -147,7 +147,7 @@ export default function GamePage() {
               : `${game.players.length}/4 jogadores`}
           </p>
 
-          {myPlayer && game.players[0]?.user_id === user?.id && game.players.length >= 2 && (
+          {myPlayer && game.players.length >= 2 && (
             <motion.button
               className="start-game-btn"
               onClick={handleStart}

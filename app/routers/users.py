@@ -10,9 +10,10 @@ router = APIRouter(tags=["auth"])
 
 @router.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.name == request.name).first()
+    name = request.name.strip().title()
+    user = db.query(User).filter(User.name == name).first()
     if not user:
-        user = User(name=request.name)
+        user = User(name=name)
         db.add(user)
         db.commit()
         db.refresh(user)

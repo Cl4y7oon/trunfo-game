@@ -38,11 +38,6 @@ venv\Scripts\activate.bat
 source venv/bin/activate
 ```
 
-**Ativar no Linux/Mac:**
-```bash
-source venv/bin/activate
-```
-
 ### 2. Instalar dependências
 
 ```bash
@@ -79,8 +74,14 @@ npm install
 
 ### 3. Iniciar o servidor de desenvolvimento
 
+**Local apenas:**
 ```bash
 npm run dev
+```
+
+**Para multiplayer na mesma rede (outros jogadores acessam pelo seu IP):**
+```bash
+npm run dev -- --host
 ```
 
 O frontend estará disponível em `http://localhost:5173`.
@@ -96,12 +97,54 @@ O frontend faz chamadas à API em `/api/*` que são redirecionadas via proxy par
 
 ---
 
+## Multiplayer na mesma rede
+
+Para que outros jogadores na mesma rede Wi-Fi acessem o jogo:
+
+1. **Inicie o frontend com `--host`:**
+   ```bash
+   cd frontend
+   npm run dev -- --host
+   ```
+
+2. **Descubra seu IP local** (Windows PowerShell):
+   ```powershell
+   ipconfig |findstr IPv4
+   ```
+   Pegue o IP da sua rede (ex: `10.20.1.213`).
+
+3. **Libere o firewall** (PowerShell como administrador, se necessário):
+   ```powershell
+   New-NetFirewallRule -DisplayName "Trunfo Game" -Direction Inbound -Protocol TCP -LocalPort 5173,8000 -Action Allow
+   ```
+
+4. **Passe o endereço para os outros jogadores:**
+   ```
+   http://SEU_IP_LOCAL:5173
+   ```
+   Exemplo: `http://10.20.1.213:5173`
+
+Cada jogador digita seu nome na tela de login e entra no mesmo jogo pela lista do menu.
+
+---
+
+## Fluxo do jogo
+
+1. **Cadastro de personagens** — Na tela de Personagens, cadastre nome e foto dos participantes
+2. **Login** — Cada jogador digita seu nome
+3. **Votação** — Antes de jogar, cada jogador vota nos atributos dos personagens (0 a 21)
+4. **Menu** — Criar ou entrar em um jogo
+5. **Jogo** — Cartas são distribuídas, cada round compara o atributo escolhido
+
+---
+
 ## Scripts úteis
 
 | Comando | Descrição |
 |---|---|
 | `uvicorn app.main:app --reload` | Inicia o backend com hot-reload |
 | `cd frontend && npm run dev` | Inicia o frontend com hot-reload |
+| `cd frontend && npm run dev -- --host` | Inicia o frontend acessível na rede |
 | `cd frontend && npm run build` | Gera build de produção do frontend |
 | `cd frontend && npm run lint` | Executa o linter no frontend |
 
