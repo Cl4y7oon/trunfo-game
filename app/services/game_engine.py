@@ -143,11 +143,35 @@ def play_card(game: Game, card_id: int, player_id: int, db: Session) -> dict:
         if has_unplayed and not already_played:
             active_not_played.append(p)
 
-    result = {"round_resolved": False, "round_winner": None, "game_finished": False}
+    result = {"round_resolved": False, "round_winner": None, "game_finished": False, "round_plays": []}
+
+    # Build current round plays data (even if not all played yet)
+    current_round_plays = db.query(RoundPlay).filter(
+        RoundPlay.game_id == game.id,
+        RoundPlay.round_number == game.current_round,
+    ).all()
+
+    round_plays_data = []
+    for play in current_round_plays:
+        card = db.query(GameCard).filter(GameCard.id == play.card_id).first()
+        stats = db.query(CharacterStat).filter(CharacterStat.character_id == card.character_id).first()
+        value = getattr(stats, game.chosen_attribute) if stats else 0
+        round_plays_data.append({
+            "player_id": play.player_id,
+            "player_name": play.player.user.name,
+            "card_id": play.card_id,
+            "character_name": card.character.name,
+            "attribute": game.chosen_attribute,
+            "value": value,
+            "is_winner": False,
+        })
+
+    result["round_plays"] = round_plays_data
 
     if len(active_not_played) == 0:
         # Todos jogaram - resolver rodada
         result = resolve_round(game, db)
+        result["round_plays"] = round_plays_data  # Keep the plays data
 
     return result
 

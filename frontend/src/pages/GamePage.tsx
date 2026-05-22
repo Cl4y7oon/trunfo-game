@@ -32,6 +32,8 @@ export default function GamePage() {
     attribute: string;
     value: number;
     plays: RoundPlayOut[];
+    roundResolved?: boolean;
+    gameFinished?: boolean;
   } | null>(null);
   const [showReveal, setShowReveal] = useState(false);
   const [error, setError] = useState('');
@@ -51,6 +53,24 @@ export default function GamePage() {
     const interval = setInterval(loadGame, 2000);
     return () => clearInterval(interval);
   }, [loadGame]);
+
+  // Update reveal screen data when game state changes during reveal
+  useEffect(() => {
+    if (showReveal && game && game.rounds_played.length > 0) {
+      const currentRoundPlays = game.rounds_played.filter(
+        (rp) => rp.round_number === game.current_round
+      );
+      setRoundResult((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          plays: currentRoundPlays,
+          roundResolved: prev.roundResolved,
+          gameFinished: prev.gameFinished,
+        };
+      });
+    }
+  }, [game?.rounds_played, game?.current_round, showReveal]);
 
   const handleStart = async () => {
     try {
@@ -73,28 +93,26 @@ export default function GamePage() {
   const handlePlayCard = async (cardId: number) => {
     try {
       const result = await playCard(gameId, cardId);
-      if (result.round_resolved && result.round_winner) {
-        // Show reveal screen with all plays
-        setRoundResult({
-          winner: result.round_winner.user_name,
-          attribute: result.round_winner.attribute,
-          value: result.round_winner.value,
-          plays: result.round_plays,
-        });
-        setShowReveal(true);
-        setTimeout(() => {
-          setShowReveal(false);
-          setRoundResult(null);
-          if (result.game_finished) {
-            setShowConfetti(true);
-          }
-          loadGame();
-        }, 5000);
-      }
+      // Show reveal screen immediately after playing
+      setShowReveal(true);
+      setRoundResult({
+        winner: result.round_winner?.user_name || '',
+        attribute: result.round_winner?.attribute || game.chosen_attribute || '',
+        value: result.round_winner?.value || 0,
+        plays: result.round_plays || [],
+        roundResolved: result.round_resolved,
+        gameFinished: result.game_finished,
+      });
       setSelectedCard(null);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erro ao jogar carta');
     }
+  };
+
+  const handleAdvance = () => {
+    setShowReveal(false);
+    setRoundResult(null);
+    loadGame();
   };
 
   if (loading || !game) {
@@ -241,7 +259,14 @@ export default function GamePage() {
             >
               <div className="reveal-header">
                 <Sparkles size={48} color="var(--gold)" />
-                <h2 className="reveal-title">RESULTADO DA RODADA</h2>
+                <h2 className="reveal-title">
+                  {roundResult?.roundResolved ? 'RESULTADO DA RODADA' : 'CARTAS NA MESA'}
+                </h2>
+                {!roundResult?.roundResolved && (
+                  <p className="reveal-subtitle">
+                    Aguardando {game.players.length - roundResult.plays.length} jogador(es)...
+                  </p>
+                )}
               </div>
 
               <div className="reveal-winner">
@@ -273,14 +298,22 @@ export default function GamePage() {
                 ))}
               </div>
 
-              <div className="reveal-timer">
-                <motion.div
-                  className="reveal-timer-bar"
-                  initial={{ width: '100%' }}
-                  animate={{ width: '0%' }}
-                  transition={{ duration: 5, ease: 'linear' }}
-                />
-              </div>
+              {roundResult?.roundResolved && (
+                <div className="reveal-result">
+                  <div className="reveal-result-label">Vencedor da rodada:</div>
+                  <div className="reveal-result-winner">{roundResult.winner}</div>
+                </div>
+              )}
+
+              <motion.button
+                className="advance-btn"
+                onClick={handleAdvance}
+                disabled={!roundResult?.roundResolved}
+                whileHover={{ scale: roundResult?.roundResolved ? 1.05 : 1 }}
+                whileTap={{ scale: roundResult?.roundResolved ? 0.95 : 1 }}
+              >
+                {roundResult?.roundResolved ? 'PRÓXIMA RODADA' : 'AGUARDANDO JOGADORES...'}
+              </motion.button>
             </motion.div>
           </motion.div>
         )}
@@ -886,6 +919,12 @@ const gameStyles = `
     margin-bottom: 1.5rem;
   }
 
+  .reveal-subtitle {
+    font-size: 0.9rem;
+    color: rgba(240, 230, 211, 0.6);
+    margin-top: 0.25rem;
+  }
+
   .reveal-title {
     font-family: var(--font-display);
     font-size: 1.8rem;
@@ -967,19 +1006,48 @@ const gameStyles = `
     font-weight: 700;
   }
 
-  .reveal-timer {
-    width: 100%;
-    height: 4px;
-    background: rgba(212, 160, 23, 0.2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 1rem;
+  .reveal-result {
+    padding: 1rem;
+    background: rgba(212, 160, 23, 0.15);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    text-align: center;
   }
 
-  .reveal-timer-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    border-radius: 2px;
+  .reveal-result-label {
+    font-size: 0.85rem;
+    color: rgba(240, 230, 211, 0.7);
+    margin-bottom: 0.25rem;
+  }
+
+  .reveal-result-winner {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+
+  .advance-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--gold), #B8860B);
+    border: none;
+    border-radius: 12px;
+    color: var(--dark);
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(212, 160, 23, 0.35);
+    transition: all 0.2s;
+  }
+  .advance-btn:hover:not(:disabled) {
+    box-shadow: 0 6px 30px rgba(212, 160, 23, 0.5);
+  }
+  .advance-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .game-error {

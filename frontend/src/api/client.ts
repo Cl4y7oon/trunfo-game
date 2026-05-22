@@ -126,6 +126,15 @@ export interface RoundResult {
   game_finished: boolean;
 }
 
+export interface RoundResultState {
+  winner: string;
+  attribute: string;
+  value: number;
+  plays: RoundPlayOut[];
+  roundResolved?: boolean;
+  gameFinished?: boolean;
+}
+
 // API calls
 export const loginUser = async (name: string): Promise<LoginResponse> => {
   const { data } = await api.post('/login', { name });
