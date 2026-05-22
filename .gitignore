@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 *.pyo
 trunfo.db
+uploads/
 
 # Node
 frontend/node_modules/

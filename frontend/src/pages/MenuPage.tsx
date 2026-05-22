@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { listGames, createGame, joinGame, getVoteStatus, type GameListOut } from '../api/client';
-import { Plus, Users, LogOut, Crown } from 'lucide-react';
+import { Plus, Users, LogOut, Crown, UserCircle } from 'lucide-react';
 
 export default function MenuPage() {
   const { user, logout } = useAuth();
@@ -82,6 +82,16 @@ export default function MenuPage() {
         </header>
 
         <div className="menu-actions">
+          <motion.button
+            className="characters-btn"
+            onClick={() => navigate('/personagens')}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <UserCircle size={24} />
+            <span>Personagens</span>
+          </motion.button>
+
           <motion.button
             className="create-game-btn"
             onClick={handleCreate}
@@ -212,7 +222,32 @@ export default function MenuPage() {
         }
 
         .menu-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
           margin-bottom: 2.5rem;
+        }
+
+        .characters-btn {
+          width: 100%;
+          padding: 1.2rem 2rem;
+          font-family: var(--font-display);
+          font-size: 1.5rem;
+          letter-spacing: 3px;
+          background: linear-gradient(135deg, var(--purple-light), #5B2D8E);
+          border: 2px solid var(--gold);
+          border-radius: 14px;
+          color: var(--gold);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          box-shadow: 0 4px 20px rgba(107, 63, 160, 0.35);
+          transition: all 0.2s;
+        }
+        .characters-btn:hover {
+          box-shadow: 0 6px 30px rgba(107, 63, 160, 0.5), var(--shadow-glow);
         }
 
         .create-game-btn {

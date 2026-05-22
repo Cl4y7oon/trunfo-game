@@ -1,8 +1,12 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.database import engine, Base
 from app.routers import users, characters, votes, game
+
+os.makedirs("uploads", exist_ok=True)
 
 
 @asynccontextmanager
@@ -25,6 +29,8 @@ app.include_router(users.router, prefix="/api")
 app.include_router(characters.router, prefix="/api")
 app.include_router(votes.router, prefix="/api")
 app.include_router(game.router, prefix="/api")
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/api/health")
