@@ -11,6 +11,7 @@ export default function MenuPage() {
   const [games, setGames] = useState<GameListOut[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [myGameId, setMyGameId] = useState<number | null>(null);
 
   const loadGames = async () => {
     try {
@@ -49,7 +50,12 @@ export default function MenuPage() {
       await joinGame(gameId);
       navigate(`/jogo/${gameId}`);
     } catch (err: any) {
-      alert(err.response?.data?.detail || 'Erro ao entrar no jogo');
+      if (err.response?.data?.detail?.includes('ja esta')) {
+        // Já está no jogo, navega direto
+        navigate(`/jogo/${gameId}`);
+      } else {
+        alert(err.response?.data?.detail || 'Erro ao entrar no jogo');
+      }
     }
   };
 

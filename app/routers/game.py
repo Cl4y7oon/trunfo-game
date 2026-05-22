@@ -126,7 +126,13 @@ def join_game(game_id: int, user: User = Depends(get_current_user), db: Session 
         GamePlayer.game_id == game.id, GamePlayer.user_id == user.id
     ).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Voce ja esta neste jogo")
+        # Retorna o jogador existente em vez de erro
+        return GamePlayerOut(
+            id=existing.id,
+            user_id=existing.user_id,
+            user_name=existing.user.name,
+            rounds_won=existing.rounds_won,
+        )
 
     player = GamePlayer(game_id=game.id, user_id=user.id)
     db.add(player)
@@ -135,8 +141,8 @@ def join_game(game_id: int, user: User = Depends(get_current_user), db: Session 
 
     return GamePlayerOut(
         id=player.id,
-        user_id=user.id,
-        user_name=user.name,
+        user_id=player.id,
+        user_name=player.user.name,
         rounds_won=0,
     )
 
