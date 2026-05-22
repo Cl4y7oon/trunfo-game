@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import {
   getGameState, startGame, chooseAttribute, playCard,
-  type GameDetailOut,
+  type GameDetailOut, type RoundPlayOut,
 } from '../api/client';
 import { ConfettiBurst } from '../components/ProgressBar';
-import { Crown, Play, Swords, Trophy, RefreshCw } from 'lucide-react';
+import { Crown, Play, Swords, Trophy, RefreshCw, Sparkles } from 'lucide-react';
 
 const ATTR_META: Record<string, { label: string; color: string; icon: string }> = {
   carismatica: { label: 'Carismática', color: '#FF2D6B', icon: '✨' },
@@ -31,7 +31,9 @@ export default function GamePage() {
     winner: string;
     attribute: string;
     value: number;
+    plays: RoundPlayOut[];
   } | null>(null);
+  const [showReveal, setShowReveal] = useState(false);
   const [error, setError] = useState('');
 
   const loadGame = useCallback(async () => {
@@ -72,18 +74,24 @@ export default function GamePage() {
     try {
       const result = await playCard(gameId, cardId);
       if (result.round_resolved && result.round_winner) {
+        // Show reveal screen with all plays
         setRoundResult({
           winner: result.round_winner.user_name,
           attribute: result.round_winner.attribute,
           value: result.round_winner.value,
+          plays: result.round_plays,
         });
-        setTimeout(() => setRoundResult(null), 3000);
-        if (result.game_finished) {
-          setShowConfetti(true);
-        }
+        setShowReveal(true);
+        setTimeout(() => {
+          setShowReveal(false);
+          setRoundResult(null);
+          if (result.game_finished) {
+            setShowConfetti(true);
+          }
+          loadGame();
+        }, 5000);
       }
       setSelectedCard(null);
-      loadGame();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erro ao jogar carta');
     }
@@ -215,6 +223,68 @@ export default function GamePage() {
   return (
     <div className="game-page">
       <ConfettiBurst active={showConfetti} />
+
+      {/* ── ROUND REVEAL SCREEN ── */}
+      <AnimatePresence>
+        {showReveal && roundResult && (
+          <motion.div
+            className="reveal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="reveal-content"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: 'spring', bounce: 0.3 }}
+            >
+              <div className="reveal-header">
+                <Sparkles size={48} color="var(--gold)" />
+                <h2 className="reveal-title">RESULTADO DA RODADA</h2>
+              </div>
+
+              <div className="reveal-winner">
+                <Trophy size={64} color="var(--gold)" />
+                <div className="reveal-winner-name">{roundResult.winner}</div>
+                <div className="reveal-attribute">
+                  {ATTR_META[roundResult.attribute]?.icon} {ATTR_META[roundResult.attribute]?.label}
+                </div>
+                <div className="reveal-value">{roundResult.value}</div>
+              </div>
+
+              <div className="reveal-plays">
+                {roundResult.plays.map((play, i) => (
+                  <motion.div
+                    key={play.player_id}
+                    className={`reveal-card ${play.is_winner ? 'reveal-card-winner' : ''}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + i * 0.1 }}
+                  >
+                    <div className="reveal-player">{play.player_name}</div>
+                    <div className="reveal-character">{play.character_name}</div>
+                    <div className="reveal-stat">
+                      <span style={{ color: ATTR_META[play.attribute]?.color }}>
+                        {ATTR_META[play.attribute]?.icon} {play.value}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="reveal-timer">
+                <motion.div
+                  className="reveal-timer-bar"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: 5, ease: 'linear' }}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Header: round + scoreboard */}
       <div className="game-top">
@@ -780,6 +850,136 @@ const gameStyles = `
   .back-menu-btn:hover {
     border-color: var(--gold);
     background: rgba(212, 160, 23, 0.1);
+  }
+
+  /* ── Round Reveal Screen ── */
+  .reveal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 10, 48, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .reveal-content {
+    background: linear-gradient(145deg, #2E1245, var(--dark));
+    border: 3px solid var(--gold);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(212, 160, 23, 0.4);
+  }
+
+  .reveal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-shadow: 0 3px 0 #8B6914;
+  }
+
+  .reveal-winner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: rgba(212, 160, 23, 0.1);
+    border-radius: 16px;
+    border: 2px solid var(--gold);
+    margin-bottom: 1.5rem;
+  }
+
+  .reveal-winner-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--yellow);
+    letter-spacing: 2px;
+  }
+
+  .reveal-attribute {
+    font-size: 1rem;
+    color: var(--parchment);
+    opacity: 0.9;
+  }
+
+  .reveal-value {
+    font-family: var(--font-numbers);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .reveal-plays {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .reveal-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(212, 160, 23, 0.2);
+    border-radius: 12px;
+  }
+
+  .reveal-card-winner {
+    border-color: var(--gold);
+    background: rgba(212, 160, 23, 0.15);
+    box-shadow: 0 0 20px rgba(212, 160, 23, 0.3);
+  }
+
+  .reveal-player {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--parchment);
+    letter-spacing: 1px;
+  }
+
+  .reveal-character {
+    font-size: 0.85rem;
+    color: rgba(240, 230, 211, 0.6);
+  }
+
+  .reveal-stat {
+    font-family: var(--font-numbers);
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .reveal-timer {
+    width: 100%;
+    height: 4px;
+    background: rgba(212, 160, 23, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+
+  .reveal-timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 2px;
   }
 
   .game-error {

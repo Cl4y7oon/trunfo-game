@@ -59,17 +59,22 @@ def build_game_detail(game: Game, user: User, db: Session) -> GameDetailOut:
             ))
 
     round_plays = db.query(RoundPlay).filter(RoundPlay.game_id == game.id).all()
-    round_outs = [
-        RoundPlayOut(
+    round_outs = []
+    for rp in round_plays:
+        card = db.query(GameCard).filter(GameCard.id == rp.card_id).first()
+        stats = db.query(CharacterStat).filter(CharacterStat.character_id == card.character_id).first()
+        attr_value = getattr(stats, rp.attribute) if stats else 0
+        round_outs.append(RoundPlayOut(
             id=rp.id,
             round_number=rp.round_number,
             player_id=rp.player_id,
+            player_name=rp.player.user.name,
             card_id=rp.card_id,
+            character_name=card.character.name,
             attribute=rp.attribute,
+            value=attr_value,
             is_winner=rp.is_winner,
-        )
-        for rp in round_plays
-    ]
+        ))
 
     return GameDetailOut(
         id=game.id,

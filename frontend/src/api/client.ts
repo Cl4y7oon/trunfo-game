@@ -95,8 +95,11 @@ export interface RoundPlayOut {
   id: number;
   round_number: number;
   player_id: number;
+  player_name: string;
   card_id: number;
+  character_name: string;
   attribute: string;
+  value: number;
   is_winner: boolean;
 }
 
@@ -119,6 +122,7 @@ export interface RoundResult {
     attribute: string;
     value: number;
   } | null;
+  round_plays: RoundPlayOut[];
   game_finished: boolean;
 }
 

@@ -206,6 +206,22 @@ def resolve_round(game: Game, db: Session) -> dict:
 
     winner_user = db.query(GamePlayer).filter(GamePlayer.id == winner_player_id).first()
 
+    # Build round plays with values for reveal screen
+    round_plays_data = []
+    for play in round_plays:
+        card = db.query(GameCard).filter(GameCard.id == play.card_id).first()
+        stats = db.query(CharacterStat).filter(CharacterStat.character_id == card.character_id).first()
+        value = getattr(stats, attr)
+        round_plays_data.append({
+            "player_id": play.player_id,
+            "player_name": play.player.user.name,
+            "card_id": play.card_id,
+            "character_name": card.character.name,
+            "attribute": attr,
+            "value": value,
+            "is_winner": play.is_winner,
+        })
+
     return {
         "round_resolved": True,
         "round_winner": {
@@ -214,5 +230,6 @@ def resolve_round(game: Game, db: Session) -> dict:
             "attribute": attr,
             "value": best_value,
         },
+        "round_plays": round_plays_data,
         "game_finished": game_finished,
     }

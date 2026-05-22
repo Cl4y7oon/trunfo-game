@@ -145,8 +145,11 @@ class RoundPlayOut(BaseModel):
     id: int
     round_number: int
     player_id: int
+    player_name: str
     card_id: int
+    character_name: str
     attribute: str
+    value: float
     is_winner: bool
     model_config = {"from_attributes": True}
 
