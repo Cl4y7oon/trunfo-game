@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Oswald:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+:root {
+  --gold: #D4A017;
+  --gold-light: #F0D060;
+  --purple-deep: #2D0A4E;
+  --purple-mid: #4A1A7A;
+  --purple-light: #6B3FA0;
+  --pink: #FF2D6B;
+  --pink-light: #FF6B9D;
+  --green: #0A875E;
+  --green-light: #14C98A;
+  --yellow: #FFD700;
+  --parchment: #F0E6D3;
+  --dark: #1A0A30;
+  --card-bg: #1E0E3A;
+
+  --font-display: 'Bangers', cursive;
+  --font-body: 'Quicksand', sans-serif;
+  --font-numbers: 'Oswald', sans-serif;
+
+  --card-radius: 16px;
+  --card-border: 3px solid var(--gold);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(212, 160, 23, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--purple-deep);
+  color: var(--parchment);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+.attr-carismatica { --attr-color: #FF2D6B; }
+.attr-sincera { --attr-color: #4ECDC4; }
+.attr-barraqueira { --attr-color: #FF6B35; }
+.attr-sonsa { --attr-color: #C44DFF; }
+.attr-lerdona { --attr-color: #5DADE2; }
+.attr-elegancia { --attr-color: #FFD700; }
