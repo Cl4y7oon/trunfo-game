@@ -133,10 +133,12 @@ export const getCharacters = async (): Promise<CharacterOut[]> => {
   return data;
 };
 
-export const createCharacter = async (name: string, file: File): Promise<CharacterOut> => {
+export const createCharacter = async (name: string, file: File | null): Promise<CharacterOut> => {
   const formData = new FormData();
   formData.append('name', name);
-  formData.append('file', file);
+  if (file) {
+    formData.append('file', file);
+  }
   const { data } = await api.post('/characters', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });

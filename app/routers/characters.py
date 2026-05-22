@@ -2,6 +2,7 @@ import os
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Character, CharacterStat
@@ -23,20 +24,23 @@ def list_characters(db: Session = Depends(get_db)):
 @router.post("/characters", response_model=CharacterOut, status_code=201)
 def create_character(
     name: str = Form(...),
-    file: UploadFile = File(...),
+    file: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
-    ext = os.path.splitext(file.filename or ".jpg")[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Extensao nao permitida: {ext}")
+    image_url = None
+    if file and file.filename:
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            raise HTTPException(status_code=400, detail=f"Extensao nao permitida: {ext}")
 
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = os.path.join(UPLOAD_DIR, filename)
+        filename = f"{uuid.uuid4().hex}{ext}"
+        filepath = os.path.join(UPLOAD_DIR, filename)
 
-    with open(filepath, "wb") as f:
-        f.write(file.file.read())
+        with open(filepath, "wb") as f:
+            f.write(file.file.read())
 
-    image_url = f"/uploads/{filename}"
+        image_url = f"/uploads/{filename}"
+
     character = Character(name=name, image_url=image_url)
     db.add(character)
     db.commit()

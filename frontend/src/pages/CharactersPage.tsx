@@ -36,7 +36,7 @@ export default function CharactersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !file) return;
+    if (!name.trim()) return;
 
     setSubmitting(true);
     try {
@@ -106,7 +106,6 @@ export default function CharactersPage() {
                 accept="image/*"
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
-                required
               />
             </div>
           </div>
@@ -114,7 +113,7 @@ export default function CharactersPage() {
           <motion.button
             className="submit-btn"
             type="submit"
-            disabled={submitting || !name.trim() || !file}
+            disabled={submitting || !name.trim()}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
